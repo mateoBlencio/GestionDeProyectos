@@ -31,3 +31,11 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Spring Boot
+mvnw
+mvnw.cmd
+/.mvn/
+log/
+spring.log
+src/main/resources/application.properties
