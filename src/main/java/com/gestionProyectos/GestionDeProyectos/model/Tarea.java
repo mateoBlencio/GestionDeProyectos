@@ -61,4 +61,8 @@ public class Tarea {
         empleadoEncargado = empleadoEncargadoP;
         estadoTarea = estadoTareaP;
     }
+
+    public void cambiarEstado(Estado estadoNuevo){
+        estadoTarea = estadoNuevo;
+    }
 }

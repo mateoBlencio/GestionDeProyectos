@@ -17,8 +17,6 @@ public class UpdateTareaRequest {
     Integer prioridad;
     @NotNull(message = "Empleado is mandatory")
     Integer empleado;
-    @NotBlank(message = "Fecha de finalizacion is mandatory")
-    LocalDateTime fechaFinalizacion;
     @NotNull(message = "Estado is mandatory")
     Integer nroEstado;
 }

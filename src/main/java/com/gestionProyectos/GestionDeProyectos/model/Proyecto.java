@@ -68,4 +68,9 @@ public class Proyecto {
     public void cambiarEstado(Estado estadoNuevo){
         estado = estadoNuevo;
     }
+
+    public boolean estaVigente(){
+        estado = this.getEstado();
+        return estado.getNroEstado() != 3;
+    }
 }

@@ -1,6 +1,7 @@
 package com.gestionProyectos.GestionDeProyectos.services;
 
 import com.gestionProyectos.GestionDeProyectos.model.*;
+import com.gestionProyectos.GestionDeProyectos.repositories.EmpleadoXProyectoRepository;
 import com.gestionProyectos.GestionDeProyectos.repositories.TareaRepository;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -23,6 +25,7 @@ public class TareaServiceImpl {
     final ProyectoServiceImpl proyectoService;
     final EmpleadoServiceImpl empleadoService;
     final EstadoServiceImpl estadoService;
+    final EmpleadoXProyectoRepository empleadoXProyectoRepository;
 
     public Page<Tarea> findAll(int page, int size){
         PageRequest pageable = PageRequest.of(page, size);
@@ -70,6 +73,7 @@ public class TareaServiceImpl {
         val empleado = empleadoService.findOne(empleadoEncargadoP)
                 .orElseThrow(() -> new IllegalArgumentException("Empleado not found"));
 
+        // La tarea se inicializa en "Pendiente"
         val estado = estadoService.findOne(1)
                 .orElseThrow(() -> new IllegalArgumentException("Estado not found"));
 
@@ -81,12 +85,18 @@ public class TareaServiceImpl {
             nroTareaP  = tareas.size() + 1;
         }
 
-        if(1 <= prioridadP && prioridadP <= 5){
+        if( 1 <= prioridadP && prioridadP <= 5 && esEmpleadoDeProyecto(empleado, proyecto) && proyecto.estaVigente()) {
             Tarea tarea = new Tarea(nroTareaP, proyecto, nombreTareaP, prioridadP, fechaCreacionP, empleado, estado);
             return tareaRepository.save(tarea);
         } else {
             throw new IllegalArgumentException("No se pudo crear");
         }
+    }
+
+    private boolean esEmpleadoDeProyecto(Empleado empleado, Proyecto proyecto){
+        val empleadoXProyecto = empleadoXProyectoRepository.findEmpleadoXProyectoByEmpleadoXProyectoId_EmpleadoAndEmpleadoXProyectoId_Proyecto(empleado, proyecto)
+                .orElseThrow(()-> new IllegalArgumentException("El empleado no esta asignado al proyecto de la tarea requerida"));
+        return empleadoXProyecto != null;
     }
 
     @Transactional
@@ -95,7 +105,6 @@ public class TareaServiceImpl {
                         String nombreTareaP,
                        Integer prioridadP,
                        Integer empleadoEncargadoP,
-                       LocalDateTime fechaFinalizacionP,
                        Integer nroEstado){
 
         val proyecto = proyectoService.findOne(nroProyecto)
@@ -114,20 +123,27 @@ public class TareaServiceImpl {
             empleado = tarea.getEmpleadoEncargado();
         }
 
+        LocalDateTime fechaFinalizacion = null;
+
         Estado estadoTarea = null;
-        if (nroEstado != null){
-             estadoTarea = estadoService.findOne(nroEstado)
-                    .orElseThrow(()-> new IllegalArgumentException("Estado not found"));
+        if ( nroEstado != null && nroEstado != 1 ) {
+
+            estadoTarea = estadoService.findOne(nroEstado)
+                     .orElseThrow(()-> new IllegalArgumentException("Estado not found"));
+             if ( estadoTarea.getNroEstado() == 3 ){ fechaFinalizacion = LocalDateTime.now(); }
+
         } else {
                 estadoTarea = tarea.getEstadoTarea();
         }
 
         Integer prioridad = (prioridadP != null) ? prioridadP : tarea.getPrioridad();
-        LocalDateTime fechaFinalizacion = (fechaFinalizacionP != null) ?
-                fechaFinalizacionP : tarea.getFechaFinalizacion() ;
         String nombreTarea = (nombreTareaP != null) ? nombreTareaP : tarea.getNombreTarea();
 
-        tarea.update(nombreTarea, prioridad, empleado, fechaFinalizacion, estadoTarea);
-        tareaRepository.save(tarea);
+        if (esEmpleadoDeProyecto(empleado, proyecto)) {
+            tarea.update(nombreTarea, prioridad, empleado, fechaFinalizacion, estadoTarea);
+            tareaRepository.save(tarea);
+        } else {
+            throw new IllegalArgumentException("No se pudo modificar tarea");
+        }
     }
 }

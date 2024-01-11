@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface EmpleadoXProyectoRepository extends JpaRepository<EmpleadoXProyecto, EmpleadoXProyectoId> {
@@ -18,4 +19,6 @@ public interface EmpleadoXProyectoRepository extends JpaRepository<EmpleadoXProy
     List<EmpleadoXProyecto> findEmpleadoXProyectoByEmpleadoXProyectoId_EmpleadoOrLider(Empleado empleado, Empleado lider);
 
     void deleteAllByEmpleadoXProyectoId_Proyecto(Proyecto proyecto);
+
+    Optional<EmpleadoXProyecto> findEmpleadoXProyectoByEmpleadoXProyectoId_EmpleadoAndEmpleadoXProyectoId_Proyecto(Empleado empleado, Proyecto proyecto);
 }

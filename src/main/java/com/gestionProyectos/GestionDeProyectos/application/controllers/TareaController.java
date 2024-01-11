@@ -69,6 +69,7 @@ public class TareaController {
                     createTareaRequest.getEmpleado());
             return ResponseHandler.created(TareaResponse.from(tarea));
         } catch (Exception e){
+            System.out.println(e.getMessage());
             return ResponseHandler.internalError();
         }
     }
@@ -95,7 +96,6 @@ public class TareaController {
                     updateTareaRequest.getNombre(),
                     updateTareaRequest.getPrioridad(),
                     updateTareaRequest.getEmpleado(),
-                    updateTareaRequest.getFechaFinalizacion(),
                     updateTareaRequest.getNroEstado());
             return ResponseHandler.success();
         } catch (Exception e){
