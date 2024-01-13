@@ -1,30 +1,27 @@
 package com.gestionProyectos.GestionDeProyectos.services;
 
 import com.gestionProyectos.GestionDeProyectos.model.Empleado;
-import com.gestionProyectos.GestionDeProyectos.model.EmpleadoXProyecto;
-import com.gestionProyectos.GestionDeProyectos.model.Proyecto;
 import com.gestionProyectos.GestionDeProyectos.model.RolEmpleado;
 import com.gestionProyectos.GestionDeProyectos.repositories.EmpleadoRepository;
 import com.gestionProyectos.GestionDeProyectos.repositories.EmpleadoXProyectoRepository;
-import com.gestionProyectos.GestionDeProyectos.repositories.ProyectoRepository;
 import com.gestionProyectos.GestionDeProyectos.repositories.RolEmpleadoRepository;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -84,7 +81,7 @@ public class EmpleadoServiceImpl {
             Empleado empleado = empleadoRepository.findById(nroEmpleado)
                     .orElseThrow(() -> new IllegalArgumentException("Empleado not found"));
 
-            RolEmpleado rolEmpleado = null;
+            RolEmpleado rolEmpleado;
             if (nroRolEmpleadoP != null) {
                 rolEmpleado = rolEmpleadoRepository.findById(nroRolEmpleadoP)
                         .orElseThrow(() -> new IllegalArgumentException("Rol not found"));
@@ -109,7 +106,7 @@ public class EmpleadoServiceImpl {
         Empleado empleadoActual = getAuthenticatedEmpleado();
 
         if (empleadoActual == null){
-            throw  new AccessDeniedException("Empleado no autenticado");
+            throw new AccessDeniedException("Empleado no autenticado");
         }
 
         List<String> rolesPermitidos = Arrays.asList("Gerente", "Analista");
@@ -126,6 +123,7 @@ public class EmpleadoServiceImpl {
             throw new AccessDeniedException("Acceso denegado");
         }
     }
+
     @Transactional
     protected void eliminarProyectosinvolucrados(Integer nroEmpleado){
         try{
@@ -141,7 +139,7 @@ public class EmpleadoServiceImpl {
                 }
             }
         } catch (Exception e){
-            throw new IllegalArgumentException("No se pudo eliminar");
+            throw new IllegalArgumentException("No se pudo eliminar", e);
         }
     }
 }

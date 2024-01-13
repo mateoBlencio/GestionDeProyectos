@@ -3,7 +3,9 @@ package com.gestionProyectos.GestionDeProyectos.services;
 import com.gestionProyectos.GestionDeProyectos.model.Cliente;
 import com.gestionProyectos.GestionDeProyectos.model.Estado;
 import com.gestionProyectos.GestionDeProyectos.model.Proyecto;
+import com.gestionProyectos.GestionDeProyectos.repositories.ClienteRepository;
 import com.gestionProyectos.GestionDeProyectos.repositories.EmpleadoXProyectoRepository;
+import com.gestionProyectos.GestionDeProyectos.repositories.EstadoRepository;
 import com.gestionProyectos.GestionDeProyectos.repositories.ProyectoRepository;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
@@ -23,8 +25,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ProyectoServiceImpl {
     final ProyectoRepository proyectoRepository;
-    final EstadoServiceImpl estadoService;
-    final ClienteServiceImpl clienteService;
+    final EstadoRepository estadoRepository;
+    final ClienteRepository clienteRepository;
     final RegistroCambiosServiceImpl registroCambiosService;
     final EmpleadoXProyectoRepository empleadoXProyectoRepository;
 
@@ -66,9 +68,9 @@ public class ProyectoServiceImpl {
             estado = proyecto.getEstado();
         }
 
-        Cliente cliente = null;
+        Cliente cliente;
         if (nro_cliente != null) {
-            cliente = clienteService.findOne(nro_cliente)
+            cliente = clienteRepository.findById(nro_cliente)
                     .orElseThrow(()-> new IllegalArgumentException("Cliente not found"));
         }else {
             cliente = proyecto.getCliente();
@@ -85,23 +87,23 @@ public class ProyectoServiceImpl {
     }
 
     @Transactional
-    public Proyecto create(final String nombreProyectoP,
-                           final LocalDateTime fechaLimiteP,
-                           final Integer precioProyecto,
-                           final Integer nro_cliente){
+    public Proyecto create( String nombreProyectoP,
+                            LocalDateTime fechaLimiteP,
+                            Integer precioProyecto,
+                            Integer nro_cliente){
 
         // El proyecto inicia en estado "PENDIENTE"
-        val estado = estadoService.findOne(1)
+        Estado estado = estadoRepository.findById(1)
                 .orElseThrow(()-> new IllegalArgumentException("Estado not found"));
 
-        val cliente = clienteService.findOne(nro_cliente)
+        Cliente cliente = clienteRepository.findById(nro_cliente)
                 .orElseThrow(()-> new IllegalArgumentException("Cliente not found"));
 
         LocalDateTime fechaInicio = LocalDateTime.now();
 
-        val proyect = new Proyecto(nombreProyectoP, estado, fechaInicio, fechaLimiteP, precioProyecto, cliente);
+        Proyecto proyecto = new Proyecto(nombreProyectoP, estado, fechaInicio, fechaLimiteP, precioProyecto, cliente);
 
-        return proyectoRepository.save(proyect);
+        return proyectoRepository.save(proyecto);
     }
 
     @Transactional
@@ -112,7 +114,7 @@ public class ProyectoServiceImpl {
 
         val estadoViejo = proyecto.getEstado();
 
-        val estadoNuevo = estadoService.findOne(nroEstadoNuevo)
+        val estadoNuevo = estadoRepository.findById(nroEstadoNuevo)
                 .orElseThrow(()-> new IllegalArgumentException("Estado not found"));
 
         if ( nroEstadoNuevo == 1 || Objects.equals(estadoViejo, estadoNuevo) ){

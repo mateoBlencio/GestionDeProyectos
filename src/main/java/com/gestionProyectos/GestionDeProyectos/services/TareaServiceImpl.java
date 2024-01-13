@@ -1,7 +1,14 @@
 package com.gestionProyectos.GestionDeProyectos.services;
 
-import com.gestionProyectos.GestionDeProyectos.model.*;
+import com.gestionProyectos.GestionDeProyectos.model.Empleado;
+import com.gestionProyectos.GestionDeProyectos.model.Estado;
+import com.gestionProyectos.GestionDeProyectos.model.Proyecto;
+import com.gestionProyectos.GestionDeProyectos.model.Tarea;
+import com.gestionProyectos.GestionDeProyectos.model.TareaId;
+import com.gestionProyectos.GestionDeProyectos.repositories.EmpleadoRepository;
 import com.gestionProyectos.GestionDeProyectos.repositories.EmpleadoXProyectoRepository;
+import com.gestionProyectos.GestionDeProyectos.repositories.EstadoRepository;
+import com.gestionProyectos.GestionDeProyectos.repositories.ProyectoRepository;
 import com.gestionProyectos.GestionDeProyectos.repositories.TareaRepository;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
@@ -14,7 +21,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -22,9 +28,9 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class TareaServiceImpl {
     final TareaRepository tareaRepository;
-    final ProyectoServiceImpl proyectoService;
-    final EmpleadoServiceImpl empleadoService;
-    final EstadoServiceImpl estadoService;
+    final ProyectoRepository proyectoRepository;
+    final EmpleadoRepository empleadoRepository;
+    final EstadoRepository estadoRepository;
     final EmpleadoXProyectoRepository empleadoXProyectoRepository;
 
     public Page<Tarea> findAll(int page, int size){
@@ -35,13 +41,13 @@ public class TareaServiceImpl {
     public Page<Tarea> findForProyect(Integer nroProyecto,
                                       int page, int size){
         PageRequest pageable = PageRequest.of(page, size);
-        val proyecto = proyectoService.findOne(nroProyecto)
+        val proyecto = proyectoRepository.findById(nroProyecto)
                 .orElseThrow(()-> new IllegalArgumentException("Proyecto not found"));
         return tareaRepository.findTareaByTareaId_NroProyecto(proyecto, pageable);
     }
 
     public Optional<Tarea> findOne(Integer nroTarea, Integer nroProyecto){
-        val proyecto = proyectoService.findOne(nroProyecto)
+        val proyecto = proyectoRepository.findById(nroProyecto)
                 .orElseThrow(()-> new IllegalArgumentException("Proyecto not found"));
         TareaId id = new TareaId(nroTarea, proyecto);
         return tareaRepository.findById(id);
@@ -50,7 +56,7 @@ public class TareaServiceImpl {
     @Transactional
     public void delete(Integer nroProyecto, Integer nroTarea){
         try{
-            val proyecto = proyectoService.findOne(nroProyecto)
+            val proyecto = proyectoRepository.findById(nroProyecto)
                     .orElseThrow(() -> new IllegalArgumentException("Proyecto not found"));
             TareaId id = new TareaId(nroTarea, proyecto);
             tareaRepository.deleteById(id);
@@ -67,18 +73,18 @@ public class TareaServiceImpl {
 
         LocalDateTime fechaCreacionP = LocalDateTime.now();
 
-        val proyecto = proyectoService.findOne(nroProyectoP)
+        val proyecto = proyectoRepository.findById(nroProyectoP)
                 .orElseThrow(() -> new IllegalArgumentException("Proyecto not found"));
 
-        val empleado = empleadoService.findOne(empleadoEncargadoP)
+        val empleado = empleadoRepository.findById(empleadoEncargadoP)
                 .orElseThrow(() -> new IllegalArgumentException("Empleado not found"));
 
         // La tarea se inicializa en "Pendiente"
-        val estado = estadoService.findOne(1)
+        val estado = estadoRepository.findById(1)
                 .orElseThrow(() -> new IllegalArgumentException("Estado not found"));
 
         List<Tarea> tareas = tareaRepository.findTareaByTareaId_NroProyecto(proyecto);
-        Integer nroTareaP = null;
+        Integer nroTareaP;
         if (tareas.isEmpty()){
             nroTareaP = 1;
         }else {
@@ -107,7 +113,7 @@ public class TareaServiceImpl {
                        Integer empleadoEncargadoP,
                        Integer nroEstado){
 
-        val proyecto = proyectoService.findOne(nroProyecto)
+        val proyecto = proyectoRepository.findById(nroProyecto)
                 .orElseThrow(() -> new IllegalArgumentException("Proyecto not found"));
 
         TareaId id = new TareaId(nroTarea, proyecto);
@@ -115,9 +121,9 @@ public class TareaServiceImpl {
         Tarea tarea = tareaRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Tarea not found"));
 
-        Empleado empleado = null;
+        Empleado empleado;
         if(empleadoEncargadoP != null) {
-            empleado = empleadoService.findOne(empleadoEncargadoP)
+            empleado = empleadoRepository.findById(empleadoEncargadoP)
                     .orElseThrow(() -> new IllegalArgumentException("Empleado not found"));
         } else {
             empleado = tarea.getEmpleadoEncargado();
@@ -125,10 +131,10 @@ public class TareaServiceImpl {
 
         LocalDateTime fechaFinalizacion = null;
 
-        Estado estadoTarea = null;
+        Estado estadoTarea;
         if ( nroEstado != null && nroEstado != 1 ) {
 
-            estadoTarea = estadoService.findOne(nroEstado)
+            estadoTarea = estadoRepository.findById(nroEstado)
                      .orElseThrow(()-> new IllegalArgumentException("Estado not found"));
              if ( estadoTarea.getNroEstado() == 3 ){ fechaFinalizacion = LocalDateTime.now(); }
 

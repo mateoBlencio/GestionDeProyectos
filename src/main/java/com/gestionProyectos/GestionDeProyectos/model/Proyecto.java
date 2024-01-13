@@ -5,7 +5,6 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
 
-import java.sql.Date;
 import java.time.LocalDateTime;
 
 @Entity
@@ -45,7 +44,7 @@ public class Proyecto {
 
     public Proyecto(){super();}
 
-    public Proyecto(String nombreProyectoP, Estado estadoP, LocalDateTime fechaInicioP, LocalDateTime fechaLimiteP, Integer precioProyectoP,Cliente clienteP){
+    public Proyecto(String nombreProyectoP, Estado estadoP, LocalDateTime fechaInicioP, LocalDateTime fechaLimiteP, Integer precioProyectoP, Cliente clienteP){
         super();
         nombreProyecto = nombreProyectoP;
         estado = estadoP;

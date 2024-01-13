@@ -16,7 +16,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -96,18 +95,8 @@ public class EmpleadoXProyectoServiceImpl {
 
     // Verifica que nungun empleado este en mas de 2 proyectos en simultaneo
     private boolean verificarCumpleReglasGruposxEmpleado(Empleado empleadoNuevo){
-//        List<EmpleadoXProyecto> listaProyectosEmpleadoSimple = empleadoXProyectoRepository
-//                .findEmpleadoXProyectoByEmpleadoXProyectoId_Empleado(empleadoNuevo);
-
         List<EmpleadoXProyecto> listaProyectos = empleadoXProyectoRepository
                 .findEmpleadoXProyectoByEmpleadoXProyectoId_EmpleadoOrLider(empleadoNuevo, empleadoNuevo);
-
-//        if (listaProyectosEmpleadoSimple.isEmpty()){
-//            return true;
-//        } else if (listaProyectosEmpleadoSimple.size() == 2) {
-//            return false;
-//        }
-
         if ( listaProyectos.isEmpty() ) {
             return true;
         } else return listaProyectos.size() != 2;
@@ -123,18 +112,5 @@ public class EmpleadoXProyectoServiceImpl {
 
         EmpleadoXProyectoId id = new EmpleadoXProyectoId(empleado, proyecto);
         empleadoXProyectoRepository.deleteById(id);
-    }
-
-    public List<Proyecto> findProyectXEmpleado(Integer nroEmpleado){
-        val empleado = empleadoRepository.findById(nroEmpleado)
-                .orElseThrow(()-> new IllegalArgumentException("Empleado not found"));
-        val empleadoXProyectos = empleadoXProyectoRepository.findEmpleadoXProyectoByEmpleadoXProyectoId_Empleado(empleado);
-
-        List<Proyecto> proyectos = new ArrayList<>();
-        empleadoXProyectos.forEach(empleadoXProyecto -> {
-            proyectos.add(empleadoXProyecto.getEmpleadoXProyectoId().getProyecto());
-        });
-
-        return proyectos;
     }
 }
