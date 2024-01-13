@@ -88,17 +88,4 @@ public class EmpleadoController {
             return ResponseHandler.internalError();
         }
     }
-
-    // SACAR
-//    @GetMapping("/{nroEmpleado}")
-//    public ResponseEntity<Object> findProyectsXEmpleados(@PathVariable Integer nroEmpleado){
-//        try {
-//            val proyectos = empleadoService.findProyectXEmpleado(nroEmpleado)
-//                    .stream()
-//                    .map(ProyectoResponse::from);
-//            return ResponseHandler.success(proyectos);
-//        } catch (Exception e){
-//            return ResponseHandler.internalError();
-//        }
-//    }
 }

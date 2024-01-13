@@ -48,7 +48,7 @@ public class TareaController {
         }
     }
 
-    @GetMapping("/tarea")
+    @GetMapping("/tareasXProyectos")
     public ResponseEntity<Object> findOne(@RequestParam Integer nroTarea, @RequestParam Integer nroProyecto){
         try{
             val tarea = tareaService.findOne(nroTarea, nroProyecto)

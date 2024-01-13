@@ -89,7 +89,7 @@ public class ProyectoController {
         }
     }
 
-    @PatchMapping("/cambiarEstado/{nroProyecto}")
+    @PatchMapping("/estados/{nroProyecto}")
     @PreAuthorize("hasAnyRole('Desarrollador', 'Diseñador', 'Gerente', 'Tester', 'Analista')")
     public ResponseEntity<Object> cambiarEstadoProyecto(@PathVariable Integer nroProyecto,
                                                         @RequestParam Integer nroEstado){

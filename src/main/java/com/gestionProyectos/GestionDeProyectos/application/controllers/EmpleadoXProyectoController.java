@@ -30,7 +30,7 @@ public class EmpleadoXProyectoController {
         }
     }
 
-    @GetMapping("/variables")
+    @GetMapping("/empleadosAndProyectos")
     @PreAuthorize("hasAnyRole('Gerente', 'Analista')")
     public ResponseEntity<Object> findOne(@RequestParam Integer nroEmpleado,
                                           @RequestParam Integer nroProyecto){
