@@ -8,8 +8,6 @@ import lombok.experimental.FieldDefaults;
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UpdateClienteRequest {
-    @NotBlank(message = "Telefono is mandatory")
     Integer telefono;
-    @NotBlank(message = "Mail is mandatory")
     String mail;
 }

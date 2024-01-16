@@ -9,10 +9,7 @@ import lombok.experimental.FieldDefaults;
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UpdateEmpleadoXProyectoRequest {
-    @NotNull(message = "Empleado is mandatory")
     Integer nroEmpleado;
-    @NotNull(message = "Proyecto is mandatory")
     Integer nroProyecto;
-    @NotBlank(message = "Lider is mandatory")
     Integer nroLider;
 }

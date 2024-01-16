@@ -11,12 +11,8 @@ import java.time.LocalDateTime;
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UpdateTareaRequest {
-    @NotBlank(message = "Nombre is mandatory")
     String nombre;
-    @NotBlank(message = "Prioridad is mandatory")
     Integer prioridad;
-    @NotNull(message = "Empleado is mandatory")
     Integer empleado;
-    @NotNull(message = "Estado is mandatory")
     Integer nroEstado;
 }

@@ -31,7 +31,7 @@ public class EstadoController {
 
     @PostMapping
     @PreAuthorize("hasRole('Gerente')")
-    public ResponseEntity<Object> create(EstadoRequest createEstadoRequest){
+    public ResponseEntity<Object> create(@RequestBody EstadoRequest createEstadoRequest){
         try{
             val estado = estadoService.create(createEstadoRequest.getNombreEstado(),
                     createEstadoRequest.getDescripcion());

@@ -1,6 +1,5 @@
 package com.gestionProyectos.GestionDeProyectos.auth.jwt;
 
-import com.gestionProyectos.GestionDeProyectos.model.Empleado;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
